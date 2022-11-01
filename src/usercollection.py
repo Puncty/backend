@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 from src.user import User
 
@@ -12,7 +13,7 @@ class UserCollection:
     def remove(self, user: User) -> None:
         self.users.remove(user)
 
-    def by_id(self, id: UUID) -> User:
+    def by_id(self, id: UUID) -> Optional[User]:
         for user in self.users:
             if user.id == id:
                 return user

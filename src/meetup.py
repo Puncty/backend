@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from uuid import UUID
 from src import User
 
 
@@ -8,6 +9,7 @@ class Meetup:
     members: list[User]
     datetime: datetime
     location: str
+    id: UUID
 
     def to_dict(self) -> dict:
         return {
