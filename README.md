@@ -1,3 +1,3 @@
-# GrabWas/backend
+# backend
 
-The backend for GrabWas
+The backend for Puncty
