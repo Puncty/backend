@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: puncty_api
+    build: .
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - "${SERVER_PORT}:3000"
