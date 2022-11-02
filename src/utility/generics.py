@@ -1,6 +1,5 @@
 from typing import Callable, Optional, TypeVar
 
-
 T = TypeVar("T")
 
 

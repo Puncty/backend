@@ -28,16 +28,15 @@ def register() -> str | tuple:
     if not (uc.by_email_address(request.form.get("email-address")) is None):
         return ("Email already in use", 400)
 
-    user = User(request.form.get("name"),
-                request.form.get("password"),
-                request.form.get("email-address"))
+    user = User(
+        request.form.get("name"),
+        request.form.get("password"),
+        request.form.get("email-address"),
+    )
     user.generate_token()
     uc.append(user)
 
-    return {
-        "id": user.id,
-        "token": user.token
-    }
+    return {"id": user.id, "token": user.token}
 
 
 @app.post("/account/login")
@@ -45,10 +44,7 @@ def login() -> str | tuple:
     user = uc.by_id(UUID(request.form.get("email-address")))
     if not (user is None) and user.verify(request.form.get("password")):
         user.generate_token()
-        return {
-            "id": user.id,
-            "token": user.token
-        }
+        return {"id": user.id, "token": user.token}
     else:
         return RETURN_UNAUTHORIZED
 

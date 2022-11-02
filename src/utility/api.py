@@ -1,13 +1,17 @@
 from typing import Callable, Literal
 from flask import Request, request
-import base64
 
 from src.user import User
 from src.usercollection import UserCollection
 from src.globals import user_collection
 
 
-def user_verified(r: Request, uc: UserCollection, attr_name="user-id") -> User | Literal[False]:
+def user_verified(r: Request, uc: UserCollection) -> User | Literal[False]:
+    """
+    whether or not a user is verified
+
+    :returns: the user when they are verified and False if not
+    """
     auth_uname, auth_token = r.authorization.username, r.authorization.password
 
     user = uc.by_id(auth_uname)

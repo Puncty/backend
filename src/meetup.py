@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from uuid import  uuid4
+from uuid import uuid4
 from src.user import User
 
 
@@ -28,5 +28,5 @@ class Meetup:
             "admin": self.admin.to_dict(),
             "members": list(map(lambda u: u.to_dict(), self.__members)),
             "datetime": int(self.datetime.timestamp()),
-            "location": self.location
+            "location": self.location,
         }

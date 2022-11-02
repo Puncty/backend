@@ -23,8 +23,4 @@ class User:
         self.token = token_hex()
 
     def to_dict(self) -> dict:
-        return {
-            "name": self.name,
-            "id": self.id,
-            "email_address": self.email_address
-        }
+        return {"name": self.name, "id": self.id, "email_address": self.email_address}
