@@ -14,6 +14,8 @@ class MeetupCollection:
         self.meetups.remove(meetup)
 
     def by_id(self, id: UUID) -> Optional[Meetup]:
+        if type(id) is str:
+            id = UUID(id)
         for meetup in self.meetups:
             if meetup.id == id:
                 return meetup

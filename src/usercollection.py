@@ -1,21 +1,23 @@
 from typing import Optional
 from uuid import UUID
 from src.user import User
+from src.utility.generics import get_first_match
 
 
 class UserCollection:
     def __init__(self) -> None:
-        self.users: list[User] = []
+        self.__users: list[User] = []
 
     def append(self, user: User) -> None:
-        self.users.append(user)
+        self.__users.append(user)
 
     def remove(self, user: User) -> None:
-        self.users.remove(user)
+        self.__users.remove(user)
 
-    def by_id(self, id: UUID) -> Optional[User]:
-        for user in self.users:
-            if user.id == id:
-                return user
+    def by_id(self, id: str | UUID) -> Optional[User]:
+        if type(id) is str:
+            id = UUID(id)
+        return get_first_match(lambda x: x.id == id, self.__users)
 
-        return None
+    def by_email_address(self, email_address: str) -> Optional[User]:
+        return get_first_match(lambda x: x.email_address == email_address, self.__users)
