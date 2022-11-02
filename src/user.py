@@ -22,7 +22,7 @@ class User:
     def generate_token(self) -> None:
         self.token = token_hex()
 
-    def to_json(self) -> dict:
+    def to_dict(self) -> dict:
         return {
             "name": self.name,
             "id": self.id,

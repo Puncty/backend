@@ -19,11 +19,14 @@ class Meetup:
     def leave(self, user: User) -> None:
         self.__members.remove(user)
 
+    def is_member(self, user: User) -> bool:
+        return user in self.__members
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "admin": self.admin.to_dict(),
-            "members": map(lambda u: u.to_dict(), self.members),
-            "datetime": self.datetime.timetuple(),
+            "members": list(map(lambda u: u.to_dict(), self.__members)),
+            "datetime": int(self.datetime.timestamp()),
             "location": self.location
         }

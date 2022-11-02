@@ -1,6 +1,7 @@
 from typing import Optional
 from uuid import UUID
 from src.meetup import Meetup
+from src.utility.generics import get_first_match
 
 
 class MeetupCollection:
@@ -16,8 +17,5 @@ class MeetupCollection:
     def by_id(self, id: UUID) -> Optional[Meetup]:
         if type(id) is str:
             id = UUID(id)
-        for meetup in self.meetups:
-            if meetup.id == id:
-                return meetup
 
-        return None
+        return get_first_match(lambda x: x.id == id, self.meetups)
