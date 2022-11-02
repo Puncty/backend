@@ -16,7 +16,10 @@ class UserCollection:
 
     def by_id(self, id: str | UUID) -> Optional[User]:
         if type(id) is str:
-            id = UUID(id)
+            try:
+                id = UUID(id)
+            except:
+                return None
         return get_first_match(lambda x: x.id == id, self.__users)
 
     def by_email_address(self, email_address: str) -> Optional[User]:

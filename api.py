@@ -5,7 +5,7 @@ from flask import Flask, request
 from src.meetup import Meetup
 
 from src.user import User
-from src.utility.api import form_has_values, require_user_auth, user_verified
+from src.utility.api import require_user_auth, require_form_entries
 from src.globals import user_collection as uc, meet_collection as mc
 
 app = Flask(__name__)
@@ -21,18 +21,12 @@ def default() -> str:
 
 
 @app.post("/account/register")
-def register() -> str | tuple:
-    if not form_has_values(request, ["name", "password", "email-address"]):
-        return RETURN_FORM_DATA_ERROR
-
-    if not (uc.by_email_address(request.form.get("email-address")) is None):
+@require_form_entries("name", "password", "email-address")
+def register(name: str, password: str, email_address: str) -> str | tuple:
+    if not (uc.by_email_address(email_address) is None):
         return ("Email already in use", 400)
 
-    user = User(
-        request.form.get("name"),
-        request.form.get("password"),
-        request.form.get("email-address"),
-    )
+    user = User(name, password, email_address)
     user.generate_token()
     uc.append(user)
 
@@ -40,9 +34,10 @@ def register() -> str | tuple:
 
 
 @app.post("/account/login")
-def login() -> str | tuple:
-    user = uc.by_id(UUID(request.form.get("email-address")))
-    if not (user is None) and user.verify(request.form.get("password")):
+@require_form_entries("email-address", "password")
+def login(email_address: str, password: str) -> str | tuple:
+    user = uc.by_email_address(email_address)
+    if not (user is None) and user.verify(password):
         user.generate_token()
         return {"id": user.id, "token": user.token}
     else:
@@ -58,13 +53,9 @@ def delete_account(user: User) -> str | tuple:
 
 
 @app.post("/meetup/create")
+@require_form_entries("datetime", "location")
 @require_user_auth
-def create_meetup(user: User, *args) -> str | tuple:
-    if not form_has_values(request, ["datetime", "location"]):
-        return RETURN_FORM_DATA_ERROR
-
-    timestamp = request.form.get("datetime", type=int)
-    location = request.form.get("location")
+def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
     meetup = Meetup(user, datetime.fromtimestamp(timestamp), location)
     mc.append(meetup)
 
@@ -75,7 +66,6 @@ def create_meetup(user: User, *args) -> str | tuple:
 @require_user_auth
 def get_meetup(user: User, meetup_id: str) -> str:
     meetup = mc.by_id(meetup_id)
-    print(meetup_id, meetup)
     if meetup is None:
         return RETURN_FORM_DATA_ERROR
 

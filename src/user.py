@@ -1,11 +1,12 @@
-from uuid import uuid4
+from typing import Optional
+from uuid import uuid4, UUID
 from secrets import token_hex
 import bcrypt
 
 
 class User:
-    def __init__(self, name: str, password: str, email_address: str) -> None:
-        self.id = uuid4()
+    def __init__(self, name: str, password: str, email_address: str, id: Optional[UUID] = None) -> None:
+        self.id = uuid4() if id is None else id
         self.name = name
         self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         self.email_address = email_address
@@ -17,7 +18,7 @@ class User:
         raise NotImplementedError()
 
     def verify(self, pw: str) -> bool:
-        return bcrypt.checkpw(pw, self.password)
+        return bcrypt.checkpw(pw.encode(), self.password)
 
     def generate_token(self) -> None:
         self.token = token_hex()

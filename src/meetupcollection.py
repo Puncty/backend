@@ -16,6 +16,9 @@ class MeetupCollection:
 
     def by_id(self, id: UUID) -> Optional[Meetup]:
         if type(id) is str:
-            id = UUID(id)
+            try:
+                id = UUID(id)
+            except:
+                return None
 
         return get_first_match(lambda x: x.id == id, self.meetups)
