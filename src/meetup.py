@@ -36,11 +36,13 @@ class Meetup:
     def is_member(self, user: User) -> bool:
         return user in self.__members
 
-    def to_dict(self) -> dict:
+    def to_dict(self, hide_sensitive_information: bool = True) -> dict:
         return {
             "id": self.id,
-            "admin": self.admin.to_dict(),
-            "members": list(map(lambda u: u.to_dict(), self.__members)),
+            "admin": self.admin.to_dict(hide_sensitive_information),
+            "members": list(
+                map(lambda u: u.to_dict(hide_sensitive_information), self.__members)
+            ),
             "datetime": int(self.datetime.timestamp()),
             "location": self.location,
         }

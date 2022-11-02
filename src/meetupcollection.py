@@ -23,8 +23,12 @@ class MeetupCollection:
 
         return get_first_match(lambda x: x.id == id, self.__meetups)
 
-    def to_dict(self) -> dict:
-        return {"meetups": [meetup.to_dict() for meetup in self.__meetups]}
+    def to_dict(self, hide_sensitive_information: bool = True) -> dict:
+        return {
+            "meetups": [
+                meetup.to_dict(hide_sensitive_information) for meetup in self.__meetups
+            ]
+        }
 
     @classmethod
     def from_dict(cls, data: dict):

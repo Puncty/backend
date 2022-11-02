@@ -34,8 +34,17 @@ class User:
     def generate_token(self) -> None:
         self.token = token_hex()
 
-    def to_dict(self) -> dict:
-        return {"name": self.name, "id": self.id, "email_address": self.email_address}
+    def to_dict(self, hide_sensitive_information: bool = True) -> dict:
+        data = {
+            "name": self.name,
+            "id": self.id,
+            "email_address": self.email_address,
+        }
+
+        if not hide_sensitive_information:
+            data["password"] = self.password
+
+        return data
 
     @classmethod
     def from_dict(cls, data: dict):
