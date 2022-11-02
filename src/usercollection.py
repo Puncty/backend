@@ -24,3 +24,10 @@ class UserCollection:
 
     def by_email_address(self, email_address: str) -> Optional[User]:
         return get_first_match(lambda x: x.email_address == email_address, self.__users)
+
+    def to_dict(self) -> dict:
+        return {"users": [user.to_dict() for user in self.__users]}
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls([User.from_dict(user) for user in data["users"]])

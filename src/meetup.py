@@ -1,17 +1,31 @@
-from dataclasses import dataclass
+from typing import Optional
 from datetime import datetime
-from uuid import uuid4
+from uuid import uuid4, UUID
+
 from src.user import User
+from src.globals import user_collection
 
 
-@dataclass
 class Meetup:
-    def __init__(self, admin: User, datetime: datetime, location: str) -> None:
+    def __init__(
+        self,
+        admin: User,
+        datetime: datetime,
+        location: str,
+        id: Optional[UUID] = None,
+        members: Optional[list[User]] = None,
+    ) -> None:
         self.admin = admin
-        self.__members = [admin]
+        self.__members = [admin] if members is None else members
         self.datetime = datetime
         self.location = location
-        self.id = uuid4()
+        self.id = uuid4() if id is None else id
+
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, Meetup):
+            return self.id == __o.id
+
+        raise NotImplementedError()
 
     def join(self, user: User) -> None:
         self.__members.append(user)
@@ -30,3 +44,13 @@ class Meetup:
             "datetime": int(self.datetime.timestamp()),
             "location": self.location,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            user_collection.by_id(data["admin"]["id"]),
+            datetime.fromtimestamp(data["datetime"]),
+            data["location"],
+            data["id"],
+            [user_collection.by_id(member["id"]) for member in data["members"]],
+        )

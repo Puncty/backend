@@ -5,14 +5,14 @@ from src.utility.generics import get_first_match
 
 
 class MeetupCollection:
-    def __init__(self) -> None:
-        self.meetups: list[Meetup] = []
+    def __init__(self, meetups: Optional[list[Meetup]] = None) -> None:
+        self.__meetups: list[Meetup] = [] if meetups is None else meetups
 
     def append(self, meetup: Meetup) -> None:
-        self.meetups.append(meetup)
+        self.__meetups.append(meetup)
 
     def remove(self, meetup: Meetup) -> None:
-        self.meetups.remove(meetup)
+        self.__meetups.remove(meetup)
 
     def by_id(self, id: UUID) -> Optional[Meetup]:
         if type(id) is str:
@@ -21,4 +21,11 @@ class MeetupCollection:
             except:
                 return None
 
-        return get_first_match(lambda x: x.id == id, self.meetups)
+        return get_first_match(lambda x: x.id == id, self.__meetups)
+
+    def to_dict(self) -> dict:
+        return {"meetups": [meetup.to_dict() for meetup in self.__meetups]}
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls([Meetup.from_dict(meetup) for meetup in data["meetups"]])

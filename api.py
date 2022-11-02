@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from uuid import UUID
-from flask import Flask, request
+from flask import Flask
 from src.meetup import Meetup
 
 from src.user import User
@@ -9,10 +8,6 @@ from src.utility.api import require_user_auth, require_form_entries
 from src.globals import user_collection as uc, meet_collection as mc
 
 app = Flask(__name__)
-
-
-RETURN_UNAUTHORIZED = ("Unauthorized", 401)
-RETURN_FORM_DATA_ERROR = ("Invalid form data", 400)
 
 
 @app.get("/")
@@ -24,7 +19,7 @@ def default() -> str:
 @require_form_entries("name", "password", "email-address")
 def register(name: str, password: str, email_address: str) -> str | tuple:
     if not (uc.by_email_address(email_address) is None):
-        return ("Email already in use", 400)
+        return "Email already in use", 400
 
     user = User(name, password, email_address)
     user.generate_token()
@@ -41,7 +36,7 @@ def login(email_address: str, password: str) -> str | tuple:
         user.generate_token()
         return {"id": user.id, "token": user.token}
     else:
-        return RETURN_UNAUTHORIZED
+        return "Wrong Credentials", 401
 
 
 @app.delete("/account")
@@ -67,12 +62,12 @@ def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
 def get_meetup(user: User, meetup_id: str) -> str:
     meetup = mc.by_id(meetup_id)
     if meetup is None:
-        return RETURN_FORM_DATA_ERROR
+        return f'The meetup id "{meetup_id}" does not exist', 404
 
     if meetup.is_member(user):
         return meetup.to_dict()
     else:
-        return RETURN_UNAUTHORIZED
+        return "You are not a member of this meetup", 401
 
 
 @app.put("/meetup/<meetup_id>/join")
@@ -89,7 +84,7 @@ def join_meetup(user: User, meetup_id: str) -> str:
 def leave_meetup(user: User, meetup_id: str) -> str:
     meetup = mc.by_id(meetup_id)
     if meetup is None:
-        return RETURN_FORM_DATA_ERROR
+        return f"The meetup id {meetup_id} does not exist", 404
 
     meetup.leave(user)
 
@@ -101,7 +96,7 @@ def leave_meetup(user: User, meetup_id: str) -> str:
 def delete_meetup(user: User, meetup_id: str) -> Optional[tuple]:
     meetup = mc.by_id(meetup_id)
     if user != meetup.admin:
-        return RETURN_UNAUTHORIZED
+        return "You are not the admin of the meeting", 401
 
     mc.remove(meetup)
 

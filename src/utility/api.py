@@ -29,12 +29,13 @@ def user_verified(r: Request, uc: UserCollection) -> User | Literal[False]:
 def require_user_auth(callback: Callable) -> Callable:
     def wrapper(**kwargs):
         if not (user := user_verified(request, user_collection)):
-            return ("Unauthorized", 401)
+            return "Unauthorized", 401
 
         return callback(user, **kwargs)
 
     wrapper.__name__ = callback.__name__
     return wrapper
+
 
 def require_form_entries(*required_keys: list[str]) -> Callable:
     def inner(callback: Callable):
@@ -42,7 +43,7 @@ def require_form_entries(*required_keys: list[str]) -> Callable:
             values = []
             for key in required_keys:
                 if not (key in request.form):
-                    return ("Invalid form data", 400)
+                    return "Invalid form data", 400
                 else:
                     values.append(request.form[key])
 
@@ -50,6 +51,7 @@ def require_form_entries(*required_keys: list[str]) -> Callable:
 
         wrapper.__name__ = callback.__name__
         return wrapper
+
     return inner
 
 

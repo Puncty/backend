@@ -5,10 +5,21 @@ import bcrypt
 
 
 class User:
-    def __init__(self, name: str, password: str, email_address: str, id: Optional[UUID] = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        password: str,
+        email_address: str,
+        id: Optional[UUID] = None,
+        hash_password: bool = True,
+    ) -> None:
         self.id = uuid4() if id is None else id
         self.name = name
-        self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        self.password = (
+            bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+            if hash_password
+            else password
+        )
         self.email_address = email_address
 
     def __eq__(self, __o: object) -> bool:
@@ -25,3 +36,9 @@ class User:
 
     def to_dict(self) -> dict:
         return {"name": self.name, "id": self.id, "email_address": self.email_address}
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            data["name"], data["password"], data["email_address"], data["id"], False
+        )
