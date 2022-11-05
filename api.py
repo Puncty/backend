@@ -21,7 +21,7 @@ def register(name: str, password: str, email_address: str) -> str | tuple:
     """
     register a new user
 
-    :param name: the username of the registering user
+    :param name: the name of the registering user
     :param password: the password of the registering user
     :param email_address: the email address of the registering user,
         which should has to be unique to the ones of other registered user:
@@ -66,7 +66,23 @@ def delete_account(user: User) -> str | tuple:
     return "ok"
 
 
-@app.post("/meetup/create")
+@app.get("/user/me")
+@require_user_auth
+def get_me(me: User) -> dict:
+    return me.to_dict()
+
+
+@app.get("/user/<user_id>")
+@require_user_auth
+def get_user(_, user_id: str) -> dict:
+    user = uc.by_id(user_id)
+    if user is None:
+        return "User not found", 404
+
+    return user.to_dict()
+
+
+@app.post("/meetup")
 @require_form_entries("datetime", "location")
 @require_user_auth
 def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
@@ -82,6 +98,11 @@ def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
 
     return meetup.id.hex
 
+
+@app.get("/meetup")
+@require_user_auth
+def get_users_meetups(user: User) -> list[str]:
+    return list(map(lambda x: str(x.id), mc.with_member(user)))
 
 @app.get("/meetup/<meetup_id>")
 @require_user_auth

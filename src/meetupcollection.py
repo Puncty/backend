@@ -1,7 +1,8 @@
 from typing import Optional
 from uuid import UUID
 from src.meetup import Meetup
-from src.utility.generics import get_first_match
+from src.user import User
+from src.utility.generics import get_first_match, get_all_matches
 
 
 class MeetupCollection:
@@ -21,7 +22,10 @@ class MeetupCollection:
             except:
                 return None
 
-        return get_first_match(lambda x: x.id == id, self.__meetups)
+        return get_first_match(lambda m: m.id == id, self.__meetups)
+
+    def with_member(self, user: User) -> list[Meetup]:
+        return get_all_matches(lambda m: m.is_member(user), self.__meetups)
 
     def to_dict(self, hide_sensitive_information: bool = True) -> dict:
         return {
