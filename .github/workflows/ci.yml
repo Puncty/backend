@@ -23,7 +23,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r dev_requirements.txt
       - name: Run tests
-        run: pytest
+        run: pytest --cov=src
 
   build-image:
     name: Build and push docker image
