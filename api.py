@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Optional
 from flask import Flask
-from src.meetup import Meetup
 
 from src.user import User
+from src.meetup import Meetup
 from src.utility.api import require_user_auth, require_form_entries
 from src.globals import user_collection as uc, meet_collection as mc
 
@@ -18,6 +18,14 @@ def default() -> str:
 @app.post("/account/register")
 @require_form_entries("name", "password", "email-address")
 def register(name: str, password: str, email_address: str) -> str | tuple:
+    """
+    register a new user
+
+    :param name: the username of the registering user
+    :param password: the password of the registering user
+    :param email_address: the email address of the registering user,
+        which should has to be unique to the ones of other registered user:
+    """
     if not (uc.by_email_address(email_address) is None):
         return "Email already in use", 400
 
@@ -31,6 +39,12 @@ def register(name: str, password: str, email_address: str) -> str | tuple:
 @app.post("/account/login")
 @require_form_entries("email-address", "password")
 def login(email_address: str, password: str) -> str | tuple:
+    """
+    log in an already existing user
+
+    :param email_address: the user's email address
+    :param password: the (unhashed/plain) password of the user
+    """
     user = uc.by_email_address(email_address)
     if not (user is None) and user.verify(password):
         user.generate_token()
@@ -42,6 +56,11 @@ def login(email_address: str, password: str) -> str | tuple:
 @app.delete("/account")
 @require_user_auth
 def delete_account(user: User) -> str | tuple:
+    """
+    delete a user's account
+
+    :param user: the user to delete
+    """
     uc.remove(user)
 
     return "ok"
@@ -51,6 +70,13 @@ def delete_account(user: User) -> str | tuple:
 @require_form_entries("datetime", "location")
 @require_user_auth
 def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
+    """
+    create a new meetup
+
+    :param user: the user which wants create the meetup
+    :param timestamp: the date/time when the meetup should take place, in the unix time format
+    :param location: the location where the meetup should take place, in a google maps compatible format
+    """
     meetup = Meetup(user, datetime.fromtimestamp(timestamp), location)
     mc.append(meetup)
 
@@ -60,6 +86,12 @@ def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
 @app.get("/meetup/<meetup_id>")
 @require_user_auth
 def get_meetup(user: User, meetup_id: str) -> str:
+    """
+    get information about a certain meetup, if the user is a member of it.
+
+    :param user: the user that wants to get the information
+    :param meetup_id: the id of the meetup
+    """
     meetup = mc.by_id(meetup_id)
     if meetup is None:
         return f'The meetup id "{meetup_id}" does not exist', 404
@@ -73,6 +105,12 @@ def get_meetup(user: User, meetup_id: str) -> str:
 @app.put("/meetup/<meetup_id>/join")
 @require_user_auth
 def join_meetup(user: User, meetup_id: str) -> str:
+    """
+    join a certain meetup.
+
+    :param user: the user that wants to join the meetup
+    :param meetup_id: the id of the meetup to join
+    """
     meetup = mc.by_id(meetup_id)
     meetup.join(user)
 
@@ -82,6 +120,12 @@ def join_meetup(user: User, meetup_id: str) -> str:
 @app.put("/meetup/<meetup_id>/leave")
 @require_user_auth
 def leave_meetup(user: User, meetup_id: str) -> str:
+    """
+    leave a certain meetup.
+
+    :param user: the user that wants to leave
+    :param meetup_id: the id of the meetup to leave
+    """
     meetup = mc.by_id(meetup_id)
     if meetup is None:
         return f"The meetup id {meetup_id} does not exist", 404
@@ -94,6 +138,13 @@ def leave_meetup(user: User, meetup_id: str) -> str:
 @app.delete("/meetup/<meetup_id>")
 @require_user_auth
 def delete_meetup(user: User, meetup_id: str) -> Optional[tuple]:
+    """
+    delete a certain meetup if the user is the admin of it.
+
+    :param user: the user, which has to be the admin of the meetup
+    :param meetup_id: the id of the meetup to delete
+    """
+
     meetup = mc.by_id(meetup_id)
     if user != meetup.admin:
         return "You are not the admin of the meeting", 401
