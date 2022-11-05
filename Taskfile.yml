@@ -1,0 +1,13 @@
+version: "3"
+
+tasks:
+    run:
+        cmds:
+            - python ./api.py
+    test:
+        cmds:
+            - pytest --cov=src
+    lint:
+        cmds:
+            - black .
+
