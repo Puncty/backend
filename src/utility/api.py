@@ -10,7 +10,7 @@ def user_verified(r: Request, uc: UserCollection) -> User | Literal[False]:
     """
     whether or not a user is verified
 
-    :returns: the user when they are verified and False if not
+    :return: the user when they are verified and False if not
     """
     auth_uname, auth_token = r.authorization.username, r.authorization.password
 
@@ -27,6 +27,11 @@ def user_verified(r: Request, uc: UserCollection) -> User | Literal[False]:
 
 
 def require_user_auth(callback: Callable) -> Callable:
+    """
+    require the authentication of a user.
+    If verified, the user object is passed as the first argument of the function
+    """
+
     def wrapper(**kwargs):
         if not (user := user_verified(request, user_collection)):
             return "Unauthorized", 401
@@ -38,6 +43,10 @@ def require_user_auth(callback: Callable) -> Callable:
 
 
 def require_form_entries(*required_keys: list[str]) -> Callable:
+    """
+    require that the request contains the given keys, and pass the values as parameters to the function
+    """
+
     def inner(callback: Callable):
         def wrapper(**kwargs):
             values = []

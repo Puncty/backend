@@ -3,7 +3,7 @@ from datetime import datetime
 from uuid import uuid4, UUID
 
 from src.user import User
-from src.globals import user_collection
+from src.usercollection import UserCollection
 
 
 class Meetup:
@@ -48,7 +48,7 @@ class Meetup:
         }
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict, user_collection: UserCollection):
         return cls(
             user_collection.by_id(data["admin"]["id"]),
             datetime.fromtimestamp(data["datetime"]),
