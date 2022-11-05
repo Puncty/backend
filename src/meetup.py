@@ -28,10 +28,12 @@ class Meetup:
         raise NotImplementedError()
 
     def join(self, user: User) -> None:
-        self.__members.append(user)
+        if not self.is_member(user):
+            self.__members.append(user)
 
     def leave(self, user: User) -> None:
-        self.__members.remove(user)
+        if self.is_member(user):
+            self.__members.remove(user)
 
     def is_member(self, user: User) -> bool:
         return user in self.__members

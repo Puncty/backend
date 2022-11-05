@@ -1,13 +1,17 @@
 from datetime import datetime
 from typing import Optional
-from flask import Flask
+from flask import Flask, request
 
 from src.user import User
 from src.meetup import Meetup
+from src.usercollection import UserCollection
+from src.meetupcollection import MeetupCollection
 from src.utility.api import require_user_auth, require_form_entries
-from src.globals import user_collection as uc, meet_collection as mc
 
 app = Flask(__name__)
+
+uc = UserCollection()
+mc = MeetupCollection()
 
 
 @app.get("/")
@@ -104,6 +108,7 @@ def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
 def get_users_meetups(user: User) -> list[str]:
     return list(map(lambda x: str(x.id), mc.with_member(user)))
 
+
 @app.get("/meetup/<meetup_id>")
 @require_user_auth
 def get_meetup(user: User, meetup_id: str) -> str:
@@ -133,6 +138,9 @@ def join_meetup(user: User, meetup_id: str) -> str:
     :param meetup_id: the id of the meetup to join
     """
     meetup = mc.by_id(meetup_id)
+    if meetup is None:
+        return f"The meetup id {meetup_id} does not exist", 404
+
     meetup.join(user)
 
     return meetup.to_dict()
@@ -156,6 +164,26 @@ def leave_meetup(user: User, meetup_id: str) -> str:
     return "ok"
 
 
+@app.patch("/meetup/<meetup_id>")
+@require_user_auth
+def edit_meetup(user: User, meetup_id: str):
+    meetup = mc.by_id(meetup_id)
+    if meetup is None:
+        return f"The meetup id {meetup_id} does not exist", 404
+
+    if user != meetup.admin:
+        return "You are not the admin of the meeting", 401
+
+    meetup.datetime = request.form["datetime"] if "datetime" in request.form else meetup.datetime
+    meetup.location = request.form["location"] if "location" in request.form else meetup.location
+
+    new_admin_id = request.form["admin"] if "admin" in request.form else None
+    if new_admin_id and (new_admin := uc.by_id(new_admin_id)) and meetup.is_member(new_admin):
+        meetup.admin = new_admin
+
+    return meetup.to_dict()
+
+
 @app.delete("/meetup/<meetup_id>")
 @require_user_auth
 def delete_meetup(user: User, meetup_id: str) -> Optional[tuple]:
@@ -167,6 +195,9 @@ def delete_meetup(user: User, meetup_id: str) -> Optional[tuple]:
     """
 
     meetup = mc.by_id(meetup_id)
+    if meetup is None:
+        return f"The meetup id {meetup_id} does not exist", 404
+
     if user != meetup.admin:
         return "You are not the admin of the meeting", 401
 
