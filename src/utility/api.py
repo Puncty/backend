@@ -3,7 +3,6 @@ from flask import Request, request
 
 from src.user import User
 from src.usercollection import UserCollection
-from src.globals import user_collection
 
 
 def user_verified(r: Request, uc: UserCollection) -> User | Literal[False]:
@@ -26,20 +25,22 @@ def user_verified(r: Request, uc: UserCollection) -> User | Literal[False]:
         return False
 
 
-def require_user_auth(callback: Callable) -> Callable:
+def require_user_auth(user_collection: UserCollection) -> Callable:
     """
     require the authentication of a user.
     If verified, the user object is passed as the first argument of the function
     """
+    def inner(callback: Callable):
+        def wrapper(**kwargs):
+            if not (user := user_verified(request, user_collection)):
+                return "Unauthorized", 401
 
-    def wrapper(**kwargs):
-        if not (user := user_verified(request, user_collection)):
-            return "Unauthorized", 401
+            return callback(user, **kwargs)
 
-        return callback(user, **kwargs)
+        wrapper.__name__ = callback.__name__
+        return wrapper
 
-    wrapper.__name__ = callback.__name__
-    return wrapper
+    return inner
 
 
 def require_form_entries(*required_keys: list[str]) -> Callable:

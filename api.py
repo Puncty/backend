@@ -58,7 +58,7 @@ def login(email_address: str, password: str) -> str | tuple:
 
 
 @app.delete("/account")
-@require_user_auth
+@require_user_auth(uc)
 def delete_account(user: User) -> str | tuple:
     """
     delete a user's account
@@ -71,7 +71,7 @@ def delete_account(user: User) -> str | tuple:
 
 
 @app.get("/user/me")
-@require_user_auth
+@require_user_auth(uc)
 def get_me(me: User) -> dict:
     """
     get information about the logged in user
@@ -82,7 +82,7 @@ def get_me(me: User) -> dict:
 
 
 @app.get("/user/<user_id>")
-@require_user_auth
+@require_user_auth(uc)
 def get_user(_, user_id: str) -> dict:
     """
     get information about a certain user
@@ -98,7 +98,7 @@ def get_user(_, user_id: str) -> dict:
 
 @app.post("/meetup")
 @require_form_entries("datetime", "location")
-@require_user_auth
+@require_user_auth(uc)
 def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
     """
     create a new meetup
@@ -114,7 +114,7 @@ def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
 
 
 @app.get("/meetup")
-@require_user_auth
+@require_user_auth(uc)
 def get_users_meetups(user: User) -> list[str]:
     """
     get the meetups in which the user is a member
@@ -125,7 +125,7 @@ def get_users_meetups(user: User) -> list[str]:
 
 
 @app.get("/meetup/<meetup_id>")
-@require_user_auth
+@require_user_auth(uc)
 def get_meetup(user: User, meetup_id: str) -> str:
     """
     get information about a certain meetup, if the user is a member of it
@@ -144,7 +144,7 @@ def get_meetup(user: User, meetup_id: str) -> str:
 
 
 @app.put("/meetup/<meetup_id>/join")
-@require_user_auth
+@require_user_auth(uc)
 def join_meetup(user: User, meetup_id: str) -> str:
     """
     join a certain meetup
@@ -162,7 +162,7 @@ def join_meetup(user: User, meetup_id: str) -> str:
 
 
 @app.put("/meetup/<meetup_id>/leave")
-@require_user_auth
+@require_user_auth(uc)
 def leave_meetup(user: User, meetup_id: str) -> str:
     """
     leave a certain meetup
@@ -180,7 +180,7 @@ def leave_meetup(user: User, meetup_id: str) -> str:
 
 
 @app.patch("/meetup/<meetup_id>")
-@require_user_auth
+@require_user_auth(uc)
 def edit_meetup(user: User, meetup_id: str) -> tuple | dict:
     """
     edit the properties of a certain meetup
@@ -206,7 +206,7 @@ def edit_meetup(user: User, meetup_id: str) -> tuple | dict:
 
 
 @app.delete("/meetup/<meetup_id>")
-@require_user_auth
+@require_user_auth(uc)
 def delete_meetup(user: User, meetup_id: str) -> Optional[tuple]:
     """
     delete a certain meetup if the user is the admin of it
