@@ -73,12 +73,22 @@ def delete_account(user: User) -> str | tuple:
 @app.get("/user/me")
 @require_user_auth
 def get_me(me: User) -> dict:
+    """
+    get information about the logged in user
+
+    :param me: the logged in user
+    """
     return me.to_dict()
 
 
 @app.get("/user/<user_id>")
 @require_user_auth
 def get_user(_, user_id: str) -> dict:
+    """
+    get information about a certain user
+
+    :param user_id: the id of the user to get information about
+    """
     user = uc.by_id(user_id)
     if user is None:
         return "User not found", 404
@@ -106,6 +116,11 @@ def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
 @app.get("/meetup")
 @require_user_auth
 def get_users_meetups(user: User) -> list[str]:
+    """
+    get the meetups in which the user is a member
+
+    :param user: the user which is supposed to appear as a member in the meetups
+    """
     return list(map(lambda x: str(x.id), mc.with_member(user)))
 
 
@@ -113,7 +128,7 @@ def get_users_meetups(user: User) -> list[str]:
 @require_user_auth
 def get_meetup(user: User, meetup_id: str) -> str:
     """
-    get information about a certain meetup, if the user is a member of it.
+    get information about a certain meetup, if the user is a member of it
 
     :param user: the user that wants to get the information
     :param meetup_id: the id of the meetup
@@ -132,7 +147,7 @@ def get_meetup(user: User, meetup_id: str) -> str:
 @require_user_auth
 def join_meetup(user: User, meetup_id: str) -> str:
     """
-    join a certain meetup.
+    join a certain meetup
 
     :param user: the user that wants to join the meetup
     :param meetup_id: the id of the meetup to join
@@ -150,7 +165,7 @@ def join_meetup(user: User, meetup_id: str) -> str:
 @require_user_auth
 def leave_meetup(user: User, meetup_id: str) -> str:
     """
-    leave a certain meetup.
+    leave a certain meetup
 
     :param user: the user that wants to leave
     :param meetup_id: the id of the meetup to leave
@@ -166,7 +181,13 @@ def leave_meetup(user: User, meetup_id: str) -> str:
 
 @app.patch("/meetup/<meetup_id>")
 @require_user_auth
-def edit_meetup(user: User, meetup_id: str):
+def edit_meetup(user: User, meetup_id: str) -> tuple | dict:
+    """
+    edit the properties of a certain meetup
+
+    :param user: the user to edit the meetup, which has to be it's admin
+    :param meetup_id: the id of the meetup to edit
+    """
     meetup = mc.by_id(meetup_id)
     if meetup is None:
         return f"The meetup id {meetup_id} does not exist", 404
@@ -188,12 +209,11 @@ def edit_meetup(user: User, meetup_id: str):
 @require_user_auth
 def delete_meetup(user: User, meetup_id: str) -> Optional[tuple]:
     """
-    delete a certain meetup if the user is the admin of it.
+    delete a certain meetup if the user is the admin of it
 
     :param user: the user, which has to be the admin of the meetup
     :param meetup_id: the id of the meetup to delete
     """
-
     meetup = mc.by_id(meetup_id)
     if meetup is None:
         return f"The meetup id {meetup_id} does not exist", 404
