@@ -7,6 +7,7 @@ from src.meetup import Meetup
 from src.usercollection import UserCollection
 from src.meetupcollection import MeetupCollection
 from src.utility.api import require_user_auth, require_form_entries
+from src.utility.general import is_email
 
 app = Flask(__name__)
 
@@ -30,6 +31,9 @@ def register(name: str, password: str, email_address: str) -> str | tuple:
     :param email_address: the email address of the registering user,
         which should has to be unique to the ones of other registered user:
     """
+    if not is_email(email_address):
+        return "Invalid email address", 400
+
     if not (uc.by_email_address(email_address) is None):
         return "Email already in use", 400
 
