@@ -10,11 +10,6 @@ def get_first_match(predicate: Callable[[T], bool], items: list[T]) -> Optional[
 
     return None
 
-def get_all_matches(predicate: Callable[[T], bool], items: list[T]) -> list[T]:
-    matches = []
-    
-    for item in items:
-        if predicate(item):
-            matches.append(item)
 
-    return matches
+def get_all_matches(predicate: Callable[[T], bool], items: list[T]) -> list[T]:
+    return [item for item in items if predicate(item)]
