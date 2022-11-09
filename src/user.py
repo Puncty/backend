@@ -29,9 +29,17 @@ class User:
         raise NotImplementedError()
 
     def verify(self, pw: str) -> bool:
+        """
+        verify that the entered password matches the users password-hash
+
+        :param pw: the password to check
+        """
         return bcrypt.checkpw(pw.encode(), self.password)
 
     def generate_token(self) -> None:
+        """
+        generate a new auth token
+        """
         self.token = token_hex()
 
     def to_dict(self, hide_sensitive_information: bool = True) -> dict:
