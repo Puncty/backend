@@ -28,14 +28,29 @@ class Meetup:
         raise NotImplementedError()
 
     def join(self, user: User) -> None:
+        """
+        join this meetup
+
+        :param user: the user to join this meetup
+        """
         if not self.is_member(user):
             self.__members.append(user)
 
     def leave(self, user: User) -> None:
+        """
+        leave this meetup
+
+        :param user: the user to leave this meetup
+        """
         if self.is_member(user):
             self.__members.remove(user)
 
     def is_member(self, user: User) -> bool:
+        """
+        check whether a user is a member of this meetup
+
+        :param user: the user to check
+        """
         return user in self.__members
 
     def to_dict(self, hide_sensitive_information: bool = True) -> dict:
@@ -56,5 +71,6 @@ class Meetup:
             datetime.fromtimestamp(data["datetime"]),
             data["location"],
             data["id"],
-            [user_collection.by_id(member["id"]) for member in data["members"]],
+            [user_collection.by_id(member["id"])
+             for member in data["members"]],
         )
