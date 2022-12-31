@@ -51,11 +51,12 @@ def require_form_entries(*required_keys: list[str]) -> Callable:
     def inner(callback: Callable):
         def wrapper(**kwargs):
             values = []
+            form = request.form | request.args
             for key in required_keys:
-                if not (key in request.form):
+                if not (key in form):
                     return "Invalid form data", 400
                 else:
-                    values.append(request.form[key])
+                    values.append(form[key])
 
             return callback(*values, **kwargs)
 
