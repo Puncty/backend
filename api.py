@@ -114,7 +114,7 @@ def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
     meetup = Meetup(user, datetime.fromtimestamp(timestamp), location)
     mc.append(meetup)
 
-    return meetup.id.hex
+    return meetup.to_dict()
 
 
 @app.get("/meetup")
@@ -125,7 +125,9 @@ def get_users_meetups(user: User) -> list[str]:
 
     :param user: the user which is supposed to appear as a member in the meetups
     """
-    return list(map(lambda x: str(x.id), mc.with_member(user)))
+    return {
+        "meetups": list(map(lambda x: str(x.id), mc.with_member(user)))
+    }
 
 
 @app.get("/meetup/<meetup_id>")
