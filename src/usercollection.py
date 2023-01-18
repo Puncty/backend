@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 from src.user import User
 from src.utility.generics import get_first_match
+from src.data import Data
 
 
 class UserCollection:
@@ -10,9 +11,11 @@ class UserCollection:
 
     def append(self, user: User) -> None:
         self.__users.append(user)
+        Data.get().write("user-collection", self.to_dict())
 
     def remove(self, user: User) -> None:
         self.__users.remove(user)
+        Data.get().write("user-collection", self.to_dict())
 
     def by_id(self, id: str | UUID) -> Optional[User]:
         if type(id) is str:
@@ -33,3 +36,10 @@ class UserCollection:
     @classmethod
     def from_dict(cls, data: dict):
         return cls([User.from_dict(user) for user in data["users"]])
+
+    @classmethod
+    def load(cls):
+        try:
+            return cls.from_dict(Data.get().read()["user-collection"])
+        except:
+            return cls()

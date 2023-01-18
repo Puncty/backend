@@ -3,6 +3,7 @@ from uuid import UUID
 from src.meetup import Meetup
 from src.user import User
 from src.utility.generics import get_first_match, get_all_matches
+from src.data import Data
 
 
 class MeetupCollection:
@@ -11,9 +12,11 @@ class MeetupCollection:
 
     def append(self, meetup: Meetup) -> None:
         self.__meetups.append(meetup)
+        Data.get().write("meetup-collection", self.to_dict())
 
     def remove(self, meetup: Meetup) -> None:
         self.__meetups.remove(meetup)
+        Data.get().write("meetup-collection", self.to_dict())
 
     def by_id(self, id: UUID) -> Optional[Meetup]:
         if type(id) is str:
@@ -37,3 +40,10 @@ class MeetupCollection:
     @classmethod
     def from_dict(cls, data: dict):
         return cls([Meetup.from_dict(meetup) for meetup in data["meetups"]])
+
+    @classmethod
+    def load(cls):
+        try:
+            return cls.from_dict(Data.get().read()["meetup-collection"])
+        except:
+            return cls()
