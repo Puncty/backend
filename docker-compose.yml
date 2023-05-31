@@ -1,11 +1,16 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  api:
-    container_name: puncty_api
-    build: .
-    restart: always
-    env_file:
-      - ./.env
-    ports:
-      - "${SERVER_PORT}:5013"
+    api:
+        container_name: puncty_api
+        build: .
+        restart: always
+        env_file:
+            - ./.env
+        labels:
+            caddy: api.puncty.de
+            caddy.reverse_proxy: "{{upstreams http 8002}}"
+networks:
+    default:
+        external:
+            name: aproxymate_caddy

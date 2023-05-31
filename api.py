@@ -231,4 +231,4 @@ def delete_meetup(user: User, meetup_id: str) -> Optional[tuple]:
 
 
 if __name__ == "__main__":
-    app.run("localhost", "5012")
+    app.run("localhost", "8002")
