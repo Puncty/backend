@@ -9,5 +9,5 @@ COPY ./requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 RUN pip install gunicorn
 
-CMD [ "gunicorn", "-b 0.0.0.0:5013", "api:app" ]
+CMD [ "gunicorn", "-b 0.0.0.0:8002", "api:app" ]
 
