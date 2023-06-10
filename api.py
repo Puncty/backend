@@ -103,7 +103,7 @@ def get_user(_, user_id: str) -> dict:
 @app.post("/meetup")
 @require_form_entries("datetime", "location")
 @require_user_auth(uc)
-def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
+def create_meetup(user: User, timestamp: str, location: str) -> str | tuple:
     """
     create a new meetup
 
@@ -111,7 +111,7 @@ def create_meetup(user: User, timestamp: int, location: str, _) -> str | tuple:
     :param timestamp: the date/time when the meetup should take place, in the unix time format
     :param location: the location where the meetup should take place, in a google maps compatible format
     """
-    meetup = Meetup(user, datetime.fromtimestamp(timestamp), location)
+    meetup = Meetup(user, datetime.fromtimestamp(int(timestamp)), location)
     mc.append(meetup)
 
     return meetup.id.hex

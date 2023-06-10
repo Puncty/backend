@@ -31,11 +31,11 @@ def require_user_auth(user_collection: UserCollection) -> Callable:
     If verified, the user object is passed as the first argument of the function
     """
     def inner(callback: Callable):
-        def wrapper(**kwargs):
+        def wrapper(*values, **kwargs):
             if not (user := user_verified(request, user_collection)):
                 return "Unauthorized", 401
 
-            return callback(user, **kwargs)
+            return callback(user, *values, **kwargs)
 
         wrapper.__name__ = callback.__name__
         return wrapper
