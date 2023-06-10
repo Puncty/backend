@@ -125,7 +125,7 @@ def get_users_meetups(user: User) -> list[str]:
 
     :param user: the user which is supposed to appear as a member in the meetups
     """
-    return list(map(lambda x: str(x.id), mc.with_member(user)))
+    return {"meetups": list(map(lambda x: str(x.id), mc.with_member(user)))}
 
 
 @app.get("/meetup/<meetup_id>")
