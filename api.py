@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from flask import Flask, request
+from flask import Flask, request, redirect
 
 from src.user import User
 from src.meetup import Meetup
@@ -145,6 +145,11 @@ def get_meetup(user: User, meetup_id: str) -> str:
         return meetup.to_dict()
     else:
         return "You are not a member of this meetup", 401
+
+
+@app.get("/meetup/<meetup_id>/join")
+def join_meetup_in_app() -> str:
+    return redirect("intent://puncty.de#Intent;scheme=http;package=de.puncty.app;end", code=302)
 
 
 @app.put("/meetup/<meetup_id>/join")
