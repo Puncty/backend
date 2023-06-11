@@ -148,8 +148,8 @@ def get_meetup(user: User, meetup_id: str) -> str:
 
 
 @app.get("/meetup/<meetup_id>/join")
-def join_meetup_in_app() -> str:
-    return redirect("intent://puncty.de#Intent;scheme=http;package=de.puncty.app;end", code=302)
+def join_meetup_in_app(meetup_id: str) -> str:
+    return redirect(f"puncty://join/{meetup_id}", code=302)
 
 
 @app.put("/meetup/<meetup_id>/join")
