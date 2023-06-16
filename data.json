@@ -1,0 +1,12 @@
+{
+    "user-collection": {
+        "users": [
+            {
+                "name": "Tch1b0",
+                "id": "9ef5de88-907f-43de-bd81-b984a3fb2891",
+                "email_address": "test@example.com",
+                "password": "$2b$12$uyyjHohgscKYAPKBgTRJROpxMeaVb3aX483tCdd82UkGZBHCj1t5S"
+            }
+        ]
+    }
+}

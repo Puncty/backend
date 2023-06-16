@@ -53,24 +53,25 @@ class Meetup:
         """
         return user in self.__members
 
-    def to_dict(self, hide_sensitive_information: bool = True) -> dict:
+    def to_dict(self, hide_sensitive_information: bool = True, compact: bool = False) -> dict:
         return {
-            "id": self.id,
-            "admin": self.admin.to_dict(hide_sensitive_information),
+            "id": str(self.id),
+            "admin": self.admin.to_dict(hide_sensitive_information) if not compact else str(self.admin.id),
             "members": list(
-                map(lambda u: u.to_dict(hide_sensitive_information), self.__members)
+                map(lambda u: u.to_dict(hide_sensitive_information)
+                    if not compact else str(u.id), self.__members)
             ),
             "datetime": int(self.datetime.timestamp()),
             "location": self.location,
         }
 
     @classmethod
-    def from_dict(cls, data: dict, user_collection: UserCollection):
+    def from_dict(cls, data: dict, user_collection: UserCollection, compact: bool = False):
         return cls(
             user_collection.by_id(data["admin"]["id"]),
             datetime.fromtimestamp(data["datetime"]),
             data["location"],
             data["id"],
-            [user_collection.by_id(member["id"])
+            [user_collection.by_id(member["id"] if not compact else member)
              for member in data["members"]],
         )

@@ -45,17 +45,18 @@ class User:
     def to_dict(self, hide_sensitive_information: bool = True) -> dict:
         data = {
             "name": self.name,
-            "id": self.id,
+            "id": str(self.id),
             "email_address": self.email_address,
         }
 
         if not hide_sensitive_information:
-            data["password"] = self.password
+            data["password"] = self.password.decode("ascii")
 
         return data
 
     @classmethod
     def from_dict(cls, data: dict):
         return cls(
-            data["name"], data["password"], data["email_address"], data["id"], False
+            data["name"], data["password"].encode(
+                "ascii"), data["email_address"], data["id"], False
         )

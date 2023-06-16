@@ -1,18 +1,23 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, Callable
 from uuid import UUID
 from src.user import User
 from src.utility.generics import get_first_match
 
 
 class UserCollection:
-    def __init__(self) -> None:
+    def __init__(self, on_mutation: Callable[[UserCollection], None] = lambda _: None) -> None:
         self.__users: list[User] = []
+        self.on_mutation: Callable[[UserCollection], None] = on_mutation
 
     def append(self, user: User) -> None:
         self.__users.append(user)
+        self.on_mutation(self)
 
     def remove(self, user: User) -> None:
         self.__users.remove(user)
+        self.on_mutation(self)
 
     def by_id(self, id: str | UUID) -> Optional[User]:
         if type(id) is str:

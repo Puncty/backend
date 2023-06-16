@@ -8,11 +8,22 @@ from src.usercollection import UserCollection
 from src.meetupcollection import MeetupCollection
 from src.utility.api import require_user_auth, require_form_entries
 from src.utility.general import is_email
+from src.utility.storage import Storage
 
 app = Flask(__name__)
+storage = Storage()
 
-uc = UserCollection()
-mc = MeetupCollection()
+
+def mutate_uc(
+    uc: UserCollection): storage["user-collection"] = uc.to_dict(False)
+
+
+def mutate_mc(
+    mc: MeetupCollection): storage["meetup-collection"] = mc.to_dict(False)
+
+
+uc = UserCollection(on_mutation=mutate_uc)
+mc = MeetupCollection(on_mutation=mutate_mc)
 
 
 @app.get("/")
