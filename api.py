@@ -11,7 +11,7 @@ from src.utility.general import is_email
 from src.utility.storage import Storage
 
 app = Flask(__name__)
-storage = Storage()
+storage = Storage("data/data.json")
 
 
 def mutate_uc(
