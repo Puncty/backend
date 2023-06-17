@@ -5,8 +5,8 @@ services:
         container_name: puncty_api
         build: .
         restart: always
-        env_file:
-            - ./.env
+        volumes:
+            - ./data.json:./data.json
         labels:
             caddy: api.puncty.de
             caddy.reverse_proxy: "{{upstreams http 8002}}"
