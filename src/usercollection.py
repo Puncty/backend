@@ -8,7 +8,7 @@ from src.utility.storage import Storage
 
 
 class UserCollection:
-    def __init__(self, users: list[User], on_mutation: Callable[[UserCollection], None] = lambda _: None) -> None:
+    def __init__(self, users: list[User] = [], on_mutation: Callable[[UserCollection], None] = lambda _: None) -> None:
         self.__users: list[User] = users
         self.on_mutation: Callable[[UserCollection], None] = on_mutation
 
