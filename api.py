@@ -24,7 +24,6 @@ def mutate_mc(
 
 uc = UserCollection.load(storage, on_mutation=mutate_uc)
 mc = MeetupCollection.load(storage, uc, on_mutation=mutate_mc)
-print(mc.to_dict())
 
 
 @app.get("/")
