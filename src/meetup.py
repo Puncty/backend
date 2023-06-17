@@ -17,6 +17,8 @@ class Meetup:
     ) -> None:
         self.admin = admin
         self.__members = [admin] if members is None else members
+        if not(admin in self.__members):
+            self.__members.append(admin)
         self.datetime = datetime
         self.location = location
         self.id = uuid4() if id is None else UUID(id)

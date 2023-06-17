@@ -20,7 +20,7 @@ class User:
             if hash_password
             else password
         )
-        self.email_address = email_address
+        self.email_address = email_address.lower()
 
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, User):
