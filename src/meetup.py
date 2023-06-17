@@ -17,9 +17,11 @@ class Meetup:
     ) -> None:
         self.admin = admin
         self.__members = [admin] if members is None else members
+        if not(admin in self.__members):
+            self.__members.append(admin)
         self.datetime = datetime
         self.location = location
-        self.id = uuid4() if id is None else id
+        self.id = uuid4() if id is None else UUID(id)
 
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, Meetup):
@@ -53,24 +55,26 @@ class Meetup:
         """
         return user in self.__members
 
-    def to_dict(self, hide_sensitive_information: bool = True) -> dict:
+    def to_dict(self, hide_sensitive_information: bool = True, compact: bool = False) -> dict:
         return {
-            "id": self.id,
-            "admin": self.admin.to_dict(hide_sensitive_information),
+            "id": str(self.id),
+            "admin": self.admin.to_dict(hide_sensitive_information) if not compact else str(self.admin.id),
             "members": list(
-                map(lambda u: u.to_dict(hide_sensitive_information), self.__members)
+                map(lambda u: u.to_dict(hide_sensitive_information)
+                    if not compact else str(u.id), self.__members)
             ),
             "datetime": int(self.datetime.timestamp()),
             "location": self.location,
         }
 
     @classmethod
-    def from_dict(cls, data: dict, user_collection: UserCollection):
+    def from_dict(cls, data: dict, user_collection: UserCollection, compact: bool = False):
         return cls(
-            user_collection.by_id(data["admin"]["id"]),
+            user_collection.by_id(
+                data["admin"]["id"] if not compact else data["admin"]),
             datetime.fromtimestamp(data["datetime"]),
             data["location"],
             data["id"],
-            [user_collection.by_id(member["id"])
+            [user_collection.by_id(member["id"] if not compact else member)
              for member in data["members"]],
         )
