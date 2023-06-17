@@ -8,12 +8,12 @@ class User:
     def __init__(
         self,
         name: str,
-        password: str,
+        password: str | bytes,
         email_address: str,
         id: Optional[UUID] = None,
         hash_password: bool = True,
     ) -> None:
-        self.id = uuid4() if id is None else id
+        self.id = uuid4() if id is None else UUID(id)
         self.name = name
         self.password = (
             bcrypt.hashpw(password.encode(), bcrypt.gensalt())
@@ -50,7 +50,7 @@ class User:
         }
 
         if not hide_sensitive_information:
-            data["password"] = self.password.decode("ascii")
+            data["password"] = self.password.decode()
 
         return data
 
@@ -58,5 +58,5 @@ class User:
     def from_dict(cls, data: dict):
         return cls(
             data["name"], data["password"].encode(
-                "ascii"), data["email_address"], data["id"], False
+            ), data["email_address"], data["id"], False
         )

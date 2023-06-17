@@ -19,11 +19,12 @@ def mutate_uc(
 
 
 def mutate_mc(
-    mc: MeetupCollection): storage["meetup-collection"] = mc.to_dict(False)
+    mc: MeetupCollection): storage["meetup-collection"] = mc.to_dict(False, True)
 
 
-uc = UserCollection(on_mutation=mutate_uc)
-mc = MeetupCollection(on_mutation=mutate_mc)
+uc = UserCollection.load(storage, on_mutation=mutate_uc)
+mc = MeetupCollection.load(storage, uc, on_mutation=mutate_mc)
+print(mc.to_dict())
 
 
 @app.get("/")

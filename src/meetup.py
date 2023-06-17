@@ -19,7 +19,7 @@ class Meetup:
         self.__members = [admin] if members is None else members
         self.datetime = datetime
         self.location = location
-        self.id = uuid4() if id is None else id
+        self.id = uuid4() if id is None else UUID(id)
 
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, Meetup):
@@ -68,7 +68,8 @@ class Meetup:
     @classmethod
     def from_dict(cls, data: dict, user_collection: UserCollection, compact: bool = False):
         return cls(
-            user_collection.by_id(data["admin"]["id"]),
+            user_collection.by_id(
+                data["admin"]["id"] if not compact else data["admin"]),
             datetime.fromtimestamp(data["datetime"]),
             data["location"],
             data["id"],

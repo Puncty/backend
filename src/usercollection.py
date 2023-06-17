@@ -4,11 +4,12 @@ from typing import Optional, Callable
 from uuid import UUID
 from src.user import User
 from src.utility.generics import get_first_match
+from src.utility.storage import Storage
 
 
 class UserCollection:
-    def __init__(self, on_mutation: Callable[[UserCollection], None] = lambda _: None) -> None:
-        self.__users: list[User] = []
+    def __init__(self, users: list[User], on_mutation: Callable[[UserCollection], None] = lambda _: None) -> None:
+        self.__users: list[User] = users
         self.on_mutation: Callable[[UserCollection], None] = on_mutation
 
     def append(self, user: User) -> None:
@@ -36,5 +37,9 @@ class UserCollection:
         }
 
     @classmethod
-    def from_dict(cls, data: dict):
-        return cls([User.from_dict(user) for user in data["users"]])
+    def from_dict(cls, data: dict, on_mutation: Callable[[UserCollection], None]):
+        return cls([User.from_dict(user) for user in data["users"]], on_mutation=on_mutation)
+
+    @classmethod
+    def load(cls, storage: Storage, on_mutation: Callable[[UserCollection], None]):
+        return cls(on_mutation=on_mutation) if not storage.has("user-collection") else cls.from_dict(storage["user-collection"], on_mutation=on_mutation)

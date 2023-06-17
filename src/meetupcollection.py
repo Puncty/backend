@@ -5,6 +5,8 @@ from uuid import UUID
 from src.meetup import Meetup
 from src.user import User
 from src.utility.generics import get_first_match, get_all_matches
+from src.utility.storage import Storage
+from src.usercollection import UserCollection
 
 
 class MeetupCollection:
@@ -32,13 +34,19 @@ class MeetupCollection:
     def with_member(self, user: User) -> list[Meetup]:
         return get_all_matches(lambda m: m.is_member(user), self.__meetups)
 
-    def to_dict(self, hide_sensitive_information: bool = True) -> dict:
+    def to_dict(self, hide_sensitive_information: bool = True, compact: bool = False) -> dict:
         return {
             "meetups": [
-                meetup.to_dict(hide_sensitive_information) for meetup in self.__meetups
+                meetup.to_dict(hide_sensitive_information, compact) for meetup in self.__meetups
             ]
         }
 
     @classmethod
-    def from_dict(cls, data: dict):
-        return cls([Meetup.from_dict(meetup) for meetup in data["meetups"]])
+    def from_dict(cls, data: dict, uc: UserCollection, on_mutation: Callable[[MeetupCollection], None], compact: bool = False):
+        return cls([Meetup.from_dict(meetup, uc, compact) for meetup in data["meetups"]], on_mutation=on_mutation)
+
+    @classmethod
+    def load(cls, storage: Storage, uc: UserCollection, on_mutation: Callable[[MeetupCollection], None]):
+        return cls(on_mutation=on_mutation) \
+            if not storage.has("meetup-collection") \
+            else cls.from_dict(storage["meetup-collection"], uc, on_mutation=on_mutation, compact=True)
