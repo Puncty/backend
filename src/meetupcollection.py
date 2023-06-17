@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import threading
+from copy import deepcopy
+from datetime import datetime
 from typing import Optional, Callable
 from uuid import UUID
 from src.meetup import Meetup
@@ -13,6 +16,21 @@ class MeetupCollection:
     def __init__(self, meetups: Optional[list[Meetup]] = None, on_mutation: Callable[[MeetupCollection], None] = lambda _: None) -> None:
         self.__meetups: list[Meetup] = [] if meetups is None else meetups
         self.on_mutation: Callable[[MeetupCollection], None] = on_mutation
+
+        # prune every half hour
+        threading.Thread(target=self.__prune_loop, args=[30 * 60]).start()
+
+    def __prune_loop(self, interval_seconds: float):
+        self.__prune()
+        threading.Timer(interval_seconds, self.__prune_loop,
+                        args=[interval_seconds]).start()
+
+    def __prune(self):
+        now = datetime.now()
+        for meetup in [m for m in self.__meetups]:
+            if now > meetup.datetime:
+                self.__meetups.remove(meetup)
+        self.on_mutation(self)
 
     def append(self, meetup: Meetup) -> None:
         self.__meetups.append(meetup)
@@ -41,12 +59,12 @@ class MeetupCollection:
             ]
         }
 
-    @classmethod
+    @ classmethod
     def from_dict(cls, data: dict, uc: UserCollection, on_mutation: Callable[[MeetupCollection], None], compact: bool = False):
         return cls([Meetup.from_dict(meetup, uc, compact) for meetup in data["meetups"]], on_mutation=on_mutation)
 
-    @classmethod
+    @ classmethod
     def load(cls, storage: Storage, uc: UserCollection, on_mutation: Callable[[MeetupCollection], None]):
-        return cls(on_mutation=on_mutation) \
+        return cls(on_mutation=on_mutation)  \
             if not storage.has("meetup-collection") \
             else cls.from_dict(storage["meetup-collection"], uc, on_mutation=on_mutation, compact=True)
