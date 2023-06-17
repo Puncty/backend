@@ -6,7 +6,7 @@ services:
         build: .
         restart: always
         volumes:
-            - ./data:app/data
+            - ./data:/app/data
         labels:
             caddy: api.puncty.de
             caddy.reverse_proxy: "{{upstreams http 8002}}"
