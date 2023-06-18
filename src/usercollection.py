@@ -29,7 +29,7 @@ class UserCollection:
         return get_first_match(lambda x: x.id == id, self.__users)
 
     def by_email_address(self, email_address: str) -> Optional[User]:
-        return get_first_match(lambda x: x.email_address == email_address, self.__users)
+        return get_first_match(lambda x: x.email_address == email_address.lower(), self.__users)
 
     def to_dict(self, hide_sensitive_information: bool = True) -> dict:
         return {
