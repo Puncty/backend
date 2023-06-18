@@ -180,6 +180,9 @@ def join_meetup(user: User, meetup_id: str) -> str:
 
     meetup.join(user)
 
+    # TODO: implement inside Meetup
+    mutate_mc(mc)
+
     return meetup.to_dict()
 
 
@@ -197,6 +200,9 @@ def leave_meetup(user: User, meetup_id: str) -> str:
         return f"The meetup id {meetup_id} does not exist", 404
 
     meetup.leave(user)
+
+    # TODO: implement inside Meetup
+    mutate_mc(mc)
 
     return "ok"
 
@@ -223,6 +229,9 @@ def edit_meetup(user: User, meetup_id: str) -> tuple | dict:
     new_admin_id = request.form["admin"] if "admin" in request.form else None
     if new_admin_id and (new_admin := uc.by_id(new_admin_id)) and meetup.is_member(new_admin):
         meetup.admin = new_admin
+
+    # TODO: implement inside Meetup
+    mutate_mc(mc)
 
     return meetup.to_dict()
 

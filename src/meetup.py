@@ -1,4 +1,6 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Optional, Callable
 from datetime import datetime
 from uuid import uuid4, UUID
 
@@ -46,6 +48,18 @@ class Meetup:
         """
         if self.is_member(user):
             self.__members.remove(user)
+            if self.admin == user and not self.is_empty():
+                self.admin = self.__members[0]
+            elif self.admin == user:
+                self.prunify()
+
+    def prunify(self) -> None:
+        """
+        edit the meetup in a way that it will be pruned in the next loop
+        """
+        self.datetime = datetime.now()
+        self.location = "Queued for deletion"
+        self.id = uuid4()
 
     def is_member(self, user: User) -> bool:
         """
@@ -54,6 +68,9 @@ class Meetup:
         :param user: the user to check
         """
         return user in self.__members
+
+    def is_empty(self) -> bool:
+        return len(self.__members) == 0
 
     def to_dict(self, hide_sensitive_information: bool = True, compact: bool = False) -> dict:
         return {
