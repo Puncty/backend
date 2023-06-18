@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import threading
-from copy import deepcopy
 from datetime import datetime
 from typing import Optional, Callable
 from uuid import UUID
@@ -21,20 +20,16 @@ class MeetupCollection:
         threading.Thread(target=self.__prune_loop, args=[30 * 60]).start()
 
     def __prune_loop(self, interval_seconds: float):
-        print("Pruning...")
         self.__prune()
         threading.Timer(interval_seconds, function=self.__prune_loop,
                         args=[interval_seconds]).start()
 
     def __prune(self):
         now = datetime.now()
-        count = 0
         for meetup in [m for m in self.__meetups]:
             if now > meetup.datetime:
                 self.__meetups.remove(meetup)
-                count += 1
         self.on_mutation(self)
-        print(f"Pruned {count} Meetups")
 
     def append(self, meetup: Meetup) -> None:
         self.__meetups.append(meetup)
