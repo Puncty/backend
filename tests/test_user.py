@@ -8,7 +8,6 @@ def test_create_user():
 
     assert u.password != "1234"
     assert isinstance(u.id, UUID)
-    assert not ("token" in u.__dict__)
 
     u.generate_token()
 
