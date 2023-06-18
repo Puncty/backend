@@ -21,6 +21,7 @@ class User:
             else password
         )
         self.email_address = email_address.lower()
+        self.generate_token()
 
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, User):
