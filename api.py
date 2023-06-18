@@ -123,9 +123,11 @@ def create_meetup(user: User, timestamp: str, location: str) -> str | tuple:
     :param location: the location where the meetup should take place, in a google maps compatible format
     """
     meetup = Meetup(user, datetime.fromtimestamp(int(timestamp)), location)
-    mc.append(meetup)
-
-    return meetup.id.hex
+    if meetup.datetime < datetime.now():
+        return "Meetup can not be set in past", 400
+    else:
+        mc.append(meetup)
+        return meetup.id.hex
 
 
 @app.get("/meetup")
